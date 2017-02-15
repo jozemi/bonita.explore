@@ -22,12 +22,16 @@ import org.bonitasoft.engine.expression.InvalidExpressionException;
  * @author Adrian Mos
  *
  */
-public class ProcessWithGetConnectorExample extends AbstractConnectorExample {
+public class ProcessWithPostConnectorExample extends AbstractConnectorExample {
 
-	private static final String REST_GET_CALL_URL = "http://localhost:8090/persons/";
+	private static final String REST_POST_CALL_URL = "http://localhost:8090/persons/";
+	
+	private static final String REST_POST_CONTENT_TYPE = "application/json";
+	
+	private static final String REST_POST_JSON_BODY = "{\"body\":\"test\"}";
 	
 	public static void main(String[] args) {
-		ProcessWithGetConnectorExample pwgce = new ProcessWithGetConnectorExample();
+		ProcessWithPostConnectorExample pwgce = new ProcessWithPostConnectorExample();
 		pwgce.runExample();
 	}
 	
@@ -40,13 +44,16 @@ public class ProcessWithGetConnectorExample extends AbstractConnectorExample {
 	DesignProcessDefinition getProcess() throws InvalidExpressionException, InvalidProcessDefinitionException {
 		ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
 		
-		processBuilder.createNewInstance("ProcessGetConnector", UUID.randomUUID().toString())
+		processBuilder.createNewInstance("ProcessPostConnector", UUID.randomUUID().toString())
 					  .addActor("User", true)
 					  .addDescription("CreatedByExternalProgram")
 					  .addStartEvent("Start")
 					  .addAutomaticTask("AutomaticTask")
-					  		.addConnector("CallREST", "rest-get", "1.0.0", ConnectorEvent.ON_ENTER)
-					  			.addInput("url", new ExpressionBuilder().createConstantStringExpression(REST_GET_CALL_URL))
+					  		.addConnector("CallREST", "rest-post", "1.0.0", ConnectorEvent.ON_ENTER)
+					  			.addInput("url", new ExpressionBuilder().createConstantStringExpression(REST_POST_CALL_URL))
+					  			.addInput("contentType", new ExpressionBuilder().createConstantStringExpression(REST_POST_CONTENT_TYPE))
+					  			.addInput("charset", new ExpressionBuilder().createConstantStringExpression("UTF-8"))
+					  			.addInput("body", new ExpressionBuilder().createConstantStringExpression(REST_POST_JSON_BODY))				  			
 					  .addEndEvent("End")
 					  .addTransition("Start", "AutomaticTask")
 					  .addTransition("AutomaticTask", "End");
@@ -57,7 +64,7 @@ public class ProcessWithGetConnectorExample extends AbstractConnectorExample {
 	void addConnectorDetails(BusinessArchiveBuilder bab) throws Exception{
 		
 		// Add connector implementation
-		bab.addConnectorImplementation(new BarResource("rest-get", IOUtils.toByteArray(ProcessWithGetConnectorExample.class.getResource("/rest-get.impl").openStream())))
+		bab.addConnectorImplementation(new BarResource("rest-post", IOUtils.toByteArray(ProcessWithGetConnectorExample.class.getResource("/rest-post.impl").openStream())))
 
 		// Add jar dependencies of the connector
 		.addClasspathResource(new BarResource("bonita-connector-rest-1.0.1.jar",IOUtils.toByteArray(ProcessWithGetConnectorExample.class.getResource("/dependencies/bonita-connector-rest-1.0.1.jar").openStream())))

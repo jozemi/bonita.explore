@@ -36,8 +36,9 @@ public abstract class AbstractConnectorExample {
 
 
 	private static final String BONITA_ENGINE_URL = "http://localhost:8080";
-	private static final String PASSWORD = "bpm";
 	private static final String USER = "walter.bates";
+	private static final String PASSWORD = "bpm";
+
 
 	public void runExample() {
 		try {
