@@ -61,7 +61,7 @@ public class ProcessWithPostConnectorUsingProcessVariableExample extends Abstrac
 					  			.addInput("charset", new ExpressionBuilder().createConstantStringExpression("UTF-8"))
 					  			.addInput("body", new ExpressionBuilder().createPatternExpression("name", "{\"name\":\"${valueVariableName}\"}", 
 					  					new ExpressionBuilder().createGroovyScriptExpression(PROCESS_VARIABLE_NAME, PROCESS_VARIABLE_NAME, PROCESS_VARIABLE_TYPE, 
-										new ExpressionBuilder().createDataExpression(PROCESS_VARIABLE_NAME, PROCESS_VARIABLE_TYPE))))
+					  							new ExpressionBuilder().createDataExpression(PROCESS_VARIABLE_NAME, PROCESS_VARIABLE_TYPE))))
 					  .addEndEvent("End")
 					  .addTransition("Start", "AutomaticTask")
 					  .addTransition("AutomaticTask", "End");
