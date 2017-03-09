@@ -1,4 +1,4 @@
-package com.xerox.explore.bonita.api;
+package com.xerox.explore.bonita.api.create;
 
 import java.util.UUID;
 
@@ -10,8 +10,11 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionConstants;
+import org.bonitasoft.engine.expression.ExpressionInterpreter;
+import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-
+import org.bonitasoft.engine.expression.Expression;
 /**
  * Create, deploy and enable a Bonita process programmatically and out-of-the-box.
  * 
@@ -22,13 +25,15 @@ import org.bonitasoft.engine.expression.InvalidExpressionException;
  * @author Adrian Mos
  *
  */
-public class ProcessWithPostConnectorExample extends AbstractConnectorExample {
+public class ProcessWithPostConnectorUsingProcessVariableExample extends AbstractConnectorExample {
 
 	private static final String REST_POST_CALL_URL = "http://localhost:8090/persons/";
 	
 	private static final String REST_POST_CONTENT_TYPE = "application/json";
 	
-	private static final String REST_POST_JSON_BODY = "{\"body\":\"test\"}";
+	private static final String PROCESS_VARIABLE_NAME = "valueVariableName";
+	
+	private static final String PROCESS_VARIABLE_TYPE = String.class.getName();
 	
 	public static void main(String[] args) {
 		ProcessWithPostConnectorExample pwgce = new ProcessWithPostConnectorExample();
@@ -42,10 +47,11 @@ public class ProcessWithPostConnectorExample extends AbstractConnectorExample {
 	 * @throws InvalidProcessDefinitionException 
 	 */
 	DesignProcessDefinition getProcess() throws InvalidExpressionException, InvalidProcessDefinitionException {
-		ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
+		ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();	
 		
 		processBuilder.createNewInstance("ProcessPostConnector", UUID.randomUUID().toString())
-					  .addActor("User", true)
+						.addActor("User", true)
+						.addData(PROCESS_VARIABLE_NAME, PROCESS_VARIABLE_TYPE, new ExpressionBuilder().createConstantStringExpression("Value"))
 					  .addDescription("CreatedByExternalProgram")
 					  .addStartEvent("Start")
 					  .addAutomaticTask("AutomaticTask")
@@ -53,7 +59,9 @@ public class ProcessWithPostConnectorExample extends AbstractConnectorExample {
 					  			.addInput("url", new ExpressionBuilder().createConstantStringExpression(REST_POST_CALL_URL))
 					  			.addInput("contentType", new ExpressionBuilder().createConstantStringExpression(REST_POST_CONTENT_TYPE))
 					  			.addInput("charset", new ExpressionBuilder().createConstantStringExpression("UTF-8"))
-					  			.addInput("body", new ExpressionBuilder().createConstantStringExpression(REST_POST_JSON_BODY))				  			
+					  			.addInput("body", new ExpressionBuilder().createPatternExpression("name", "{\"name\":\"${valueVariableName}\"}", 
+					  					new ExpressionBuilder().createGroovyScriptExpression(PROCESS_VARIABLE_NAME, PROCESS_VARIABLE_NAME, PROCESS_VARIABLE_TYPE, 
+					  							new ExpressionBuilder().createDataExpression(PROCESS_VARIABLE_NAME, PROCESS_VARIABLE_TYPE))))
 					  .addEndEvent("End")
 					  .addTransition("Start", "AutomaticTask")
 					  .addTransition("AutomaticTask", "End");

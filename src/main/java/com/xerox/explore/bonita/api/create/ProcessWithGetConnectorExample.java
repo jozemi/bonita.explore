@@ -1,4 +1,4 @@
-package com.xerox.explore.bonita.api;
+package com.xerox.explore.bonita.api.create;
 
 import java.util.UUID;
 
